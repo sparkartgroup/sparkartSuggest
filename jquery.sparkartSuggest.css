@@ -1,0 +1,47 @@
+.sparkart-suggest {
+	
+	display: none;
+	list-style: none;
+	position: absolute;
+	z-index: 900001;
+	min-width: 150px;
+	margin: 0;
+	padding: 0;
+	border: rgba( 0, 0, 0, 0.2 ) 1px solid;
+	border-top: rgba( 0, 0, 0, 0.1 ) 1px solid;
+	font: 14px sans-serif;
+	background: #fff;
+	-webkit-border-radius: 0px 0px 3px 3px;
+	border-radius: 0px 0px 5px 5px;
+	-webkit-box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+	box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+	
+}
+
+.sparkart-suggest.active {
+	
+	display: block;	
+	
+}
+
+.sparkart-suggest.empty,
+.sparkart-suggest.empty.active {
+	
+	display: none;	
+	
+}
+
+.sparkart-suggest > li {
+	
+	cursor: pointer;
+	padding: 4px 7px;
+	border-top: rgba( 0, 0, 0, 0.05 ) 1px solid;
+	
+}
+
+.sparkart-suggest > li.selected {
+	
+	color: #fff;
+	background: #00a9c7;	
+	
+}
