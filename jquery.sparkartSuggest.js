@@ -11,6 +11,7 @@ Sparkart Suggest
 	var DEFAULT_THRESHOLD = 2;
 	var DEFAULT_DELAY = 150;
 	var DEFAULT_MAX = 8;
+	var DEFAULT_FIT = true;
 	var DEFAULT_COMPARATOR = function( source, string ){
 		// http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex#answer-6969486
 		var regex_safe_string = string.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' );
@@ -20,7 +21,7 @@ Sparkart Suggest
 	var DEFAULT_SORTER = function( a, b ){
 		return ( a < b )? -1: ( a > b )? 1: 0;
 	};
-	var SUGGEST_ELEMENT_CONSTRUCTOR = function( suggestion ){
+	var DEFAULT_ELEMENT_CONSTRUCTOR = function( suggestion ){
 		return '<li class="suggestion">'+ suggestion +'</li>';
 	};
 	
@@ -37,6 +38,7 @@ Sparkart Suggest
 				var data = {};
 				data.comparator = options.comparator || DEFAULT_COMPARATOR;
 				data.sorter = options.sorter || DEFAULT_SORTER;
+				data.elementConstructor = options.elementConstructor || DEFAULT_ELEMENT_CONSTRUCTOR;
 				data.source = options.source || [];
 				if( typeof data.source !== 'function' ){
 					var source = data.source.slice(0);
@@ -53,6 +55,7 @@ Sparkart Suggest
 				data.threshold = options.threshold || DEFAULT_THRESHOLD;
 				data.delay = options.delay || DEFAULT_DELAY;
 				data.max = options.max || DEFAULT_MAX;
+				data.fit = options.fit || DEFAULT_FIT;
 				data.delay_timer = null;
 				data.suggestions = null;
 				
@@ -69,6 +72,7 @@ Sparkart Suggest
 				$this.data( 'sparkart_suggest', data );
 				
 				// Create suggestion interface
+				var $container = data.$container = $('<div class="sparkart-suggest container" />');
 				var $suggestions = data.$suggestions = $('<ul class="sparkart-suggest suggestions empty" />');
 				
 				// Bind interface events
@@ -118,7 +122,9 @@ Sparkart Suggest
 				});
 				
 				// Add elements to DOM
-				$('body').append( $suggestions );
+				$('body').append( $container.append($suggestions) );
+				
+				$container.width( $this.outerWidth() );
 				
 			});
 			
@@ -137,7 +143,9 @@ Sparkart Suggest
 				
 				data.$suggestions
 					.empty()
-					.addClass('empty')
+					.addClass('empty');
+					
+				data.$container
 					.css({
 						top: offset.top + height,
 						left: offset.left
@@ -146,7 +154,7 @@ Sparkart Suggest
 				if( string && string.length >= data.threshold ){
 					$this.sparkartSuggest( 'suggestions', string, function( suggestions ){
 						for( var i in suggestions ){
-							var suggestion_html = SUGGEST_ELEMENT_CONSTRUCTOR( suggestions[i] );
+							var suggestion_html = data.elementConstructor( suggestions[i] );
 							data.$suggestions.append( suggestion_html );
 						}
 						data.$suggestions.toggleClass( 'empty', suggestions.length === 0 );
@@ -247,13 +255,18 @@ Sparkart Suggest
 				index = index || data.$suggestions.children('.selected').index();
 				
 				if( index > -1 ){
-				
+					
 					var suggestion = data.suggestions[index];
+					var event = $.Event('select');
+					event.suggestion = suggestion;
+					$this.trigger( event );
+					
+					if( event.isDefaultPrevented() ) return;	
 					
 					data.$suggestions.empty().addClass('empty');
 					$this.val( suggestion ).focus();
 					
-					data.suggestions = [];
+					data.suggestions = [];					
 					
 				}
 				
