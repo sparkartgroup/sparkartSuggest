@@ -1,9 +1,16 @@
-.sparkart-suggest {
+div.sparkart-suggest.container {
+	
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 900001;
+	
+}
+
+ul.sparkart-suggest.suggestions {
 	
 	display: none;
 	list-style: none;
-	position: absolute;
-	z-index: 900001;
 	min-width: 150px;
 	margin: 0;
 	padding: 0;
@@ -18,20 +25,20 @@
 	
 }
 
-.sparkart-suggest.active {
+ul.sparkart-suggest.suggestions.active {
 	
 	display: block;	
 	
 }
 
-.sparkart-suggest.empty,
-.sparkart-suggest.empty.active {
+ul.sparkart-suggest.suggestions.empty,
+ul.sparkart-suggest.suggestions.empty.active {
 	
 	display: none;	
 	
 }
 
-.sparkart-suggest > li {
+ul.sparkart-suggest.suggestions > li {
 	
 	cursor: pointer;
 	padding: 4px 7px;
@@ -39,7 +46,7 @@
 	
 }
 
-.sparkart-suggest > li.selected {
+ul.sparkart-suggest.suggestions > li.selected {
 	
 	color: #fff;
 	background: #32aaee;	
