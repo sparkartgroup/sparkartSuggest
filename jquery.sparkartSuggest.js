@@ -312,9 +312,8 @@ Sparkart Suggest
 
 					data.$suggestions.empty().addClass('empty');
 					$this.val( suggestion );
-					setTimeout(function(){
-						$this.trigger('focus', false);
-					},100);
+
+					$this.trigger('focus', false);
 				}
 			});
 		},
