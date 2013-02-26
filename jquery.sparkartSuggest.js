@@ -14,6 +14,9 @@ Sparkart Suggest
 	var DEFAULT_FIT = true;
 	var DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE = true;
 	var DEFAULT_SELECT_FIRST = false;
+	// Built off of http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+	var DEFAULT_DISABLED_KEYCODES = [16, 17, 18, 19, 20, 33, 34, 35, 36, 37, 39, 45, 91, 92, 93,
+		112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 123, 124, 125, 144, 145];
 	var DEFAULT_COMPARATOR = function( source, string ){
 		// http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex#answer-6969486
 		var regex_safe_string = string.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' );
@@ -24,7 +27,7 @@ Sparkart Suggest
 		return ( a < b )? -1: ( a > b )? 1: 0;
 	};
 	var DEFAULT_ELEMENT_CONSTRUCTOR = function( suggestion ){
-		return '<li class="suggestion">'+ suggestion +'</li>';
+		return '<li class="suggestion selectable">'+ suggestion +'</li>';
 	};
 
 	var methods = {
@@ -45,6 +48,7 @@ Sparkart Suggest
 					// Disable default autocomplete values
 					$this.attr("autocomplete", false);
 				}
+				data.disabledKeycodes = options.disabledKeycodes || DEFAULT_DISABLED_KEYCODES;
 				data.comparator = options.comparator || DEFAULT_COMPARATOR;
 				data.sorter = options.sorter || DEFAULT_SORTER;
 				data.elementConstructor = options.elementConstructor || DEFAULT_ELEMENT_CONSTRUCTOR;
@@ -92,20 +96,22 @@ Sparkart Suggest
 						}
 					},
 					'keydown.sparkart-suggest': function( e ){
-						var $selected = $suggestions.children('.selected');
-						switch(e.which){
+						var $selected = $suggestions.children('.selectable.selected');
+
+						// Determine which key has been pressed.
+						switch(true){
 							// Up
-							case 38 :
+							case e.which === 38 :
 								e.preventDefault();
 								$this.sparkartSuggest('previous');
 							break;
 							// Down
-							case 40 :
+							case e.which === 40 :
 								e.preventDefault();
 								$this.sparkartSuggest('next');
 							break;
 							// Enter
-							case 13 :
+							case e.which === 13 :
 								if( $selected.length ){
 									e.preventDefault();
 									e.stopPropagation();
@@ -113,10 +119,24 @@ Sparkart Suggest
 								}
 							break;
 							// Tab
-							case 9 :
+							case e.which === 9 :
 								var index = $selected.index();
 								$this.sparkartSuggest( 'select', index );
 							break;
+
+							// In the event the user presses a non-character key, such as
+							// shift / ctrl / windows / etc, we do not want to re-fire
+							// the update and select events
+							case ($.inArray(e.which, data.disabledKeycodes) > -1) :
+								// Do nothing...
+							break;
+
+							// Escape
+							case e.which === 27 :
+								$this.sparkartSuggest('inactive');
+								$this.trigger('focus', false);
+							break;
+
 							// Other key
 							default :
 								if( data.delay_timer ) clearTimeout( data.delay_timer );
@@ -140,11 +160,11 @@ Sparkart Suggest
 
 				$suggestions
 					/* mouse events */
-					.on('mouseenter.sparkart-suggest', '> li', function( event ){
+					.on('mouseenter.sparkart-suggest', '> li.selectable', function( event ){
 						var index = $(this).index();
 						$this.sparkartSuggest( 'highlight', index );
 					})
-					.on('mousedown.sparkart-suggest', '> li', function( event ){
+					.on('mousedown.sparkart-suggest', '> li.selectable', function( event ){
 						var $suggestion = $suggestions.children('.selected');
 						var index = $suggestion.index();
 						$this.sparkartSuggest( 'select', index );
