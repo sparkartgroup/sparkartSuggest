@@ -46,7 +46,7 @@ Sparkart Suggest
 				if (data.disableDefaultAutocomplete === true)
 				{
 					// Disable default autocomplete values
-					$this.attr("autocomplete", false);
+					$this.attr("autocomplete", "off");
 				}
 				data.disabledKeycodes = options.disabledKeycodes || DEFAULT_DISABLED_KEYCODES;
 				data.comparator = options.comparator || DEFAULT_COMPARATOR;
