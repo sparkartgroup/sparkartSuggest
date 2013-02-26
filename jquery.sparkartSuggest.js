@@ -124,6 +124,12 @@ Sparkart Suggest
 								$this.sparkartSuggest( 'select', index );
 							break;
 
+							// Escape
+							case e.which === 27 :
+								$this.sparkartSuggest('inactive');
+								$this.trigger('focus', false);
+							break;
+
 							// In the event the user presses a non-character key, such as
 							// shift / ctrl / windows / etc, we do not want to re-fire
 							// the update and select events
@@ -131,17 +137,11 @@ Sparkart Suggest
 								// Do nothing...
 							break;
 
-							// Escape
-							case e.which === 27 :
-								$this.sparkartSuggest('inactive');
-								$this.trigger('focus', false);
-							break;
-
 							// Other key
 							default :
 								if( data.delay_timer ) clearTimeout( data.delay_timer );
 								data.delay_timer = setTimeout( function(){
-									$this.sparkartSuggest('update');
+									$this.sparkartSuggest('active');
 								}, data.delay );
 							break;
 						}
