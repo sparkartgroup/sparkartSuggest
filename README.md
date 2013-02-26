@@ -31,6 +31,7 @@ function( string, options, callback ){
 * **threshold** - *(integer)* - The number of characters that must be typed before suggestions start to appear. Defaults to `2`.
 * **max** - *(integer)* - The maximum number of suggestions to show. Defaults to `8`.
 * **delay** - *(integer)* - How long (in milliseconds) the plugin waits before loading suggestions. Defaults to `150`.
+* **disableDefaultAutocomplete** - *(boolean)* - Many browsers have a built-in autocomplete option that can interfere with this plugin, this will attempt to disable that.  Defaults to `true`.
 * **sorter** - *(function)* - A function used to sort returned results. This is the default sorter:
 
 ```javascript
