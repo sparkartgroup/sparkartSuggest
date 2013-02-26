@@ -86,10 +86,8 @@ Sparkart Suggest
 
 				// Bind interface events
 				$this.on({
-					'focus.sparkart-suggest': function( event, param ){
-						if (typeof param === "string" && param === "select"){
-							return true;
-						} else {
+					'focus.sparkart-suggest': function( event, fireEvent ){
+						if (fireEvent === undefined || fireEvent === true){
 							$this.sparkartSuggest('active');
 						}
 					},
@@ -293,7 +291,10 @@ Sparkart Suggest
 					if( event.isDefaultPrevented() ) return;
 
 					data.$suggestions.empty().addClass('empty');
-					$this.val( suggestion ).trigger('focus', 'select');
+					$this.val( suggestion );
+					setTimeout(function(){
+						$this.trigger('focus', false);
+					},100);
 				}
 			});
 		},
