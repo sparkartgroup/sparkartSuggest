@@ -19,7 +19,7 @@ In order to use sparkartSuggest you'll need to include jQuery, jquery.sparkartSu
 
 ## Configuration
 
-* **aSsource** - *(array<string>)* - An array of strings to use as suggestions.
+* **asSource** - *(array of strings)* - An array of strings to use as suggestions.
 * **fnSource** - *(function)* - Alternatively, pass a function that returns a list of suggestions. An example source function:
 
 ```javascript
@@ -34,7 +34,7 @@ function( string, options, callback ){
 * **iMax** - *(integer)* - The maximum number of suggestions to show. Defaults to `8`.
 * **iDelay** - *(integer)* - How long (in milliseconds) the plugin waits before loading suggestions. Defaults to `150`.
 * **bDisableDefaultAutocomplete** - *(boolean)* - Many browsers have a built-in autocomplete option that can interfere with this plugin, this will attempt to disable that.  Defaults to `true`.
-* **aiDisabledKeycodes** - *(Array<int>)* - Array of keyCode integers representing keys we do not want events fired on.
+* **aiDisabledKeycodes** - *(array of integers)* - Array of keyCode integers representing keys we do not want events fired on.
 
 ```javascript
 var DEFAULT_DISABLED_KEYCODES = [16, 17, 18, 19, 20, 33, 34, 35, 36, 37, 39, 45, 91, 92, 93,
