@@ -159,13 +159,12 @@
                                 if( $selected.length ){
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    $this.sparkartSuggest('select');
+                                    $this.sparkartSuggest('select', $selected.index());
                                 }
                             break;
                             // Tab
                             case e.which === 9 :
-                                var index = $selected.index();
-                                $this.sparkartSuggest( 'select', index );
+                                $this.sparkartSuggest( 'select', $selected.index() );
                             break;
 
                             // Escape
