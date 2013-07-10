@@ -525,5 +525,4 @@ Modifed by Daniel Carbone
 		}
 
 	};
-
 })( jQuery );
