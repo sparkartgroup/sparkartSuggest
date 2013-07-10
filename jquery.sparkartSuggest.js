@@ -55,6 +55,11 @@ Modifed by Daniel Carbone
 			return this.each( function(){
 
 				var $this = $( this );
+
+                if ( typeof options.fnBeforeInit === 'function' ){
+                    options.fnBeforeInit($this);
+                }
+
                 var data = {
                     bDisableDefaultAutocomplete : options.bDisableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE,
                     aiDisabledKeycodes          : options.aiDisabledKeycodes || DEFAULT_DISABLED_KEYCODES,
@@ -93,9 +98,7 @@ Modifed by Daniel Carbone
                     fnBeforePrevious    : options.fnBeforePrevious || null,
                     fnAfterPrevious     : options.fnAfterPrevious || null,
                     fnBeforeDestroy     : options.fnBeforeDestroy || null,
-                    fnAfterDestroy      : options.fnAfterDestroy || null,
-                    fnBeforeInit        : options.fnBeforeInit || null,
-                    fnAfterInit         : options.fnAfterInit || null
+                    fnAfterDestroy      : options.fnAfterDestroy || null
                 };
 
                 if (!(data.asSource instanceof Array) && typeof data.fnSource !== "function" ){
@@ -227,6 +230,10 @@ Modifed by Daniel Carbone
                 }
                 $container.width( width );
 			});
+
+            if ( typeof options.fnAfterInit === 'function' ){
+                options.fnAfterInit($this, data);
+            }
 		},
 
 		// Draw the suggestions list
