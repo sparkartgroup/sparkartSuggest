@@ -19,7 +19,8 @@ In order to use sparkartSuggest you'll need to include jQuery, jquery.sparkartSu
 
 ## Configuration
 
-* **source** - *(array,function)* - An array of strings to use as suggestions. Alternatively, a function that returns a list of suggestions. An example source function:
+* **aSsource** - *(array<string>)* - An array of strings to use as suggestions.
+* **fnSource** - *(function)* - Alternatively, pass a function that returns a list of suggestions. An example source function:
 
 ```javascript
 function( string, options, callback ){
@@ -28,25 +29,27 @@ function( string, options, callback ){
 	});
 }
 ```
-* **threshold** - *(integer)* - The number of characters that must be typed before suggestions start to appear. Defaults to `2`.
-* **max** - *(integer)* - The maximum number of suggestions to show. Defaults to `8`.
-* **delay** - *(integer)* - How long (in milliseconds) the plugin waits before loading suggestions. Defaults to `150`.
-* **disableDefaultAutocomplete** - *(boolean)* - Many browsers have a built-in autocomplete option that can interfere with this plugin, this will attempt to disable that.  Defaults to `true`.
-* **disabledKeycodes** - *(Array<int>)* - Array of keyCode integers representing keys we do not want events fired on.
+
+* **iThreshold** - *(integer)* - The number of characters that must be typed before suggestions start to appear. Defaults to `2`.
+* **iMax** - *(integer)* - The maximum number of suggestions to show. Defaults to `8`.
+* **iDelay** - *(integer)* - How long (in milliseconds) the plugin waits before loading suggestions. Defaults to `150`.
+* **bDisableDefaultAutocomplete** - *(boolean)* - Many browsers have a built-in autocomplete option that can interfere with this plugin, this will attempt to disable that.  Defaults to `true`.
+* **aiDisabledKeycodes** - *(Array<int>)* - Array of keyCode integers representing keys we do not want events fired on.
 
 ```javascript
 var DEFAULT_DISABLED_KEYCODES = [16, 17, 18, 19, 20, 33, 34, 35, 36, 37, 39, 45, 91, 92, 93,
 	112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 123, 124, 125, 144, 145];
 ```
 
-* **sorter** - *(function)* - A function used to sort returned results. This is the default sorter:
+* **fnSorter** - *(function)* - A function used to sort returned results. This is the default sorter:
 
 ```javascript
 function( a, b ){
 	return ( a < b )? -1: ( a > b )? 1: 0;
 }
 ```
-* **comparator** - *(function)* - A function used to determine which strings match. This is the default comparator:
+
+* **fnComparator** - *(function)* - A function used to determine which strings match. This is the default comparator:
 
 ```javascript
 function( source, string ){
@@ -56,6 +59,33 @@ function( source, string ){
 	return regex.test( source ) && string !== source;
 }
 ```
+
+## Before & After function hooks
+
+Available hooks:
+
+* fnBeforeSource      
+* fnAfterSource       
+* fnBeforeActive      
+* fnAfterActive       
+* fnBeforeInactive    
+* fnAfterInactive     
+* fnBeforeUpdate      
+* fnAfterUpdate       
+* fnBeforeSelect      
+* fnAfterSelect       
+* fnBeforeSuggestions 
+* fnAfterSuggestions  
+* fnBeforeHighlight   
+* fnAfterHighlight    
+* fnBeforeNext        
+* fnAfterNext         
+* fnBeforePrevious    
+* fnAfterPrevious     
+* fnBeforeDestroy     
+* fnAfterDestroy      
+* fnBeforeInit        
+* fnAfterInit         
 
 ## License
 
