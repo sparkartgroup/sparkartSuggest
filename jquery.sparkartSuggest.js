@@ -220,7 +220,7 @@ Modifed by Daniel Carbone
                 // Define width of the container
                 var width = 0;
                 if ( typeof data.fnWidth === "function" ){
-                    width = data.fnWidth($this);
+                    width = data.fnWidth($this, data);
                 }
                 else if ( typeof data.sWidth === "string" ){
                     width = data.sWidth;
@@ -229,11 +229,13 @@ Modifed by Daniel Carbone
                     width = $this.outerWidth();
                 }
                 $container.width( width );
+
+                if ( typeof options.fnAfterInit === 'function' ){
+                    options.fnAfterInit($this, data);
+                }
+
 			});
 
-            if ( typeof options.fnAfterInit === 'function' ){
-                options.fnAfterInit($this, data);
-            }
 		},
 
 		// Draw the suggestions list
@@ -281,6 +283,27 @@ Modifed by Daniel Carbone
 
 		},
 
+        // Execute fnSource to get list of suggestions
+        source : function( string, options, callback ){
+
+            var $this = $(this);
+            var data = $this.data('sparkart_suggest');
+
+            if ( typeof data.fnBeforeSource === 'function' ){
+                data.fnBeforeSource($this, data);
+            }
+
+            data.fnSource( string, options, function( suggestions ){
+                data.suggestions = suggestions;
+                callback( suggestions );
+            });
+
+            if ( typeof data.fnAfterSource === 'function' ){
+                data.fnAfterSource($this, data);
+            }
+
+        },
+
 		// Return the list of suggestions
 		suggestions: function( string, callback ){
 
@@ -298,10 +321,7 @@ Modifed by Daniel Carbone
 				iMax: data.iMax
 			};
 
-			data.fnSource( string, options, function( suggestions ){
-				data.suggestions = suggestions;
-				callback( suggestions );
-			});
+            $this.sparkartSuggest('source', string, options, callback);
 
             if ( typeof data.fnAfterSuggestions === "function" ){
                 data.fnAfterSuggestions($this, data);
