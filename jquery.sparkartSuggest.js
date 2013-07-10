@@ -1,14 +1,14 @@
 /*
 
-Sparkart Suggest
+ Sparkart Suggest
 
-Originally written by Timothy Kempf
-@link https://github.com/SparkartGroupInc/sparkartSuggest
+ Originally written by Timothy Kempf
+ @link https://github.com/SparkartGroupInc/sparkartSuggest
 
-Modifed by Daniel Carbone
-@link https://github.com/dcarbone/sparkartSuggest
+ Modifed by Daniel Carbone
+ @link https://github.com/dcarbone/sparkartSuggest
 
-*/
+ */
 
 (function( $ ){
 
@@ -220,7 +220,7 @@ Modifed by Daniel Carbone
                 // Define width of the container
                 var width = 0;
                 if ( typeof data.fnWidth === "function" ){
-                    width = data.fnWidth($this, data);
+                    width = data.fnWidth( $this, data );
                 }
                 else if ( typeof data.sWidth === "string" ){
                     width = data.sWidth;
@@ -231,7 +231,7 @@ Modifed by Daniel Carbone
                 $container.width( width );
 
                 if ( typeof options.fnAfterInit === 'function' ){
-                    options.fnAfterInit($this, data);
+                    options.fnAfterInit( $this, data );
                 }
 
             });
@@ -248,7 +248,7 @@ Modifed by Daniel Carbone
                 string = string || $this.val();
 
                 if ( typeof data.fnBeforeUpdate === "function" ){
-                    data.fnBeforeUpdate($this, data, string);
+                    data.fnBeforeUpdate( $this, data, string );
                 }
 
                 var offset = $this.offset();
@@ -277,7 +277,7 @@ Modifed by Daniel Carbone
                 }
 
                 if ( typeof data.fnAfterUpdate === "function" ){
-                    data.fnAfterUpdate($this, data, string);
+                    data.fnAfterUpdate( $this, data, string );
                 }
             });
 
@@ -290,7 +290,7 @@ Modifed by Daniel Carbone
             var data = $this.data('sparkart_suggest');
 
             if ( typeof data.fnBeforeSource === 'function' ){
-                data.fnBeforeSource($this, data);
+                data.fnBeforeSource( $this, data );
             }
 
             data.fnSource( string, options, function( suggestions ){
@@ -299,7 +299,7 @@ Modifed by Daniel Carbone
             });
 
             if ( typeof data.fnAfterSource === 'function' ){
-                data.fnAfterSource($this, data);
+                data.fnAfterSource( $this, data );
             }
 
         },
@@ -312,7 +312,7 @@ Modifed by Daniel Carbone
             string = string || $this.val();
 
             if ( typeof data.fnBeforeSuggestions === "function" ){
-                data.fnBeforeSuggestions($this, data, string);
+                data.fnBeforeSuggestions( $this, data, string );
             }
 
             var options = {
@@ -324,7 +324,7 @@ Modifed by Daniel Carbone
             $this.sparkartSuggest('source', string, options, callback);
 
             if ( typeof data.fnAfterSuggestions === "function" ){
-                data.fnAfterSuggestions($this, data);
+                data.fnAfterSuggestions( $this, data );
             }
         },
 
@@ -339,14 +339,14 @@ Modifed by Daniel Carbone
                 var $to_highlight = data.$suggestions.children(':eq('+ index +')');
 
                 if ( typeof data.fnBeforeHighlight === "function" ){
-                    data.fnBeforeHighlight($this, data, $selected, $to_highlight);
+                    data.fnBeforeHighlight( $this, data, $selected, $to_highlight );
                 }
 
                 $selected.removeClass('selected');
                 $to_highlight.addClass('selected');
 
                 if ( typeof data.fnAfterHighlight === "function" ){
-                    data.fnAfterHighlight($this, data, $selected, $to_highlight);
+                    data.fnAfterHighlight( $this, data, $selected, $to_highlight );
                 }
 
             });
@@ -362,7 +362,7 @@ Modifed by Daniel Carbone
                 var data = $this.data('sparkart_suggest');
 
                 if ( typeof data.fnBeforeNext === "function" ){
-                    data.fnBeforeNext($this, data);
+                    data.fnBeforeNext( $this, data );
                 }
 
                 if( !data.$suggestions.is(':empty') ){
@@ -376,7 +376,7 @@ Modifed by Daniel Carbone
                 }
 
                 if ( typeof data.fnAfterNext === "function" ){
-                    data.fnAfterNext($this, data);
+                    data.fnAfterNext( $this, data );
                 }
 
             });
@@ -392,7 +392,7 @@ Modifed by Daniel Carbone
                 var data = $this.data('sparkart_suggest');
 
                 if ( typeof data.fnBeforePrevious === "function" ){
-                    data.fnBeforePrevious($this, data);
+                    data.fnBeforePrevious( $this, data );
                 }
 
                 if( !data.$suggestions.is(':empty') ){
@@ -406,7 +406,7 @@ Modifed by Daniel Carbone
                 }
 
                 if ( typeof data.fnAfterPrevious === "function" ){
-                    data.fnAfterPrevious($this, data);
+                    data.fnAfterPrevious( $this, data );
                 }
 
             });
@@ -421,7 +421,7 @@ Modifed by Daniel Carbone
                 var $this = $(this);
                 var data = $this.data('sparkart_suggest');
                 if ( typeof data.fnBeforeSelect === "function" ){
-                    data.fnBeforeSelect($this, data);
+                    data.fnBeforeSelect( $this, data );
                 }
                 index = index || data.$suggestions.children('.selected').index();
 
@@ -441,7 +441,7 @@ Modifed by Daniel Carbone
                 }
 
                 if ( typeof data.fnAfterSelect === 'function' ){
-                    data.fnAfterSelect($this, data);
+                    data.fnAfterSelect( $this, data );
                 }
             });
         },
@@ -455,13 +455,13 @@ Modifed by Daniel Carbone
                 var data = $this.data('sparkart_suggest');
 
                 if ( typeof data.fnBeforeActive === 'function' ){
-                    data.fnBeforeActive($this, data);
+                    data.fnBeforeActive( $this, data );
                 }
 
                 data.$suggestions.addClass('active');
 
                 if ( typeof data.fnAfterActive === "function" ){
-                    data.fnAfterActive($this, data);
+                    data.fnAfterActive( $this, data );
                 }
 
                 $this.sparkartSuggest('update');
@@ -479,13 +479,13 @@ Modifed by Daniel Carbone
                 var data = $this.data('sparkart_suggest');
 
                 if ( typeof data.fnBeforeInactive === 'function' ){
-                    data.fnBeforeInactive($this, data);
+                    data.fnBeforeInactive( $this, data );
                 }
 
                 data.$suggestions.removeClass('active');
 
                 if ( typeof data.fnAfterInactive === 'function' ){
-                    data.fnAfterInactive($this, data);
+                    data.fnAfterInactive( $this, data );
                 }
 
             });
@@ -499,7 +499,7 @@ Modifed by Daniel Carbone
             var data = $this.data('sparkart_suggest');
 
             if ( typeof data.fnBeforeDestroy === 'function' ){
-                data.fnBeforeDestroy($this, data);
+                data.fnBeforeDestroy( $this, data );
             }
 
             data.$suggestions.remove();
@@ -507,7 +507,7 @@ Modifed by Daniel Carbone
             $this.removeData('sparkart_suggest');
 
             if ( typeof data.fnAfterDestroy === 'function' ){
-                data.fnAfterDestroy($this, data);
+                data.fnAfterDestroy( $this, data );
             }
 
         }
