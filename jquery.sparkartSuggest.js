@@ -23,25 +23,25 @@ Modifed by Daniel Carbone
 	// Built off of http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 	var DEFAULT_DISABLED_KEYCODES = [16, 17, 18, 19, 20, 33, 34, 35, 36, 37, 39, 45, 91, 92, 93,
 		112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 123, 124, 125, 144, 145];
-    /**
-     * @return {boolean}
-     */
-    var DEFAULT_COMPARATOR = function( source, string ){
+	/**
+	 * @return {boolean}
+	 */
+	var DEFAULT_COMPARATOR = function( source, string ){
 		// http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex#answer-6969486
 		var regex_safe_string = string.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' );
 		var regex = new RegExp( '^'+ regex_safe_string, 'i' );
 		return regex.test( source ) && string !== source;
 	};
-    /**
-     * @return {number}
-     */
-    var DEFAULT_SORTER = function( a, b ){
+	/**
+	 * @return {number}
+	 */
+	var DEFAULT_SORTER = function( a, b ){
 		return ( a < b )? -1: ( a > b )? 1: 0;
 	};
-    /**
-     * @return {string}
-     */
-    var DEFAULT_ELEMENT_CONSTRUCTOR = function( suggestion ){
+	/**
+	 * @return {string}
+	 */
+	var DEFAULT_ELEMENT_CONSTRUCTOR = function( suggestion ){
 		return '<li class="suggestion selectable">'+ suggestion +'</li>';
 	};
 
@@ -56,65 +56,65 @@ Modifed by Daniel Carbone
 
 				var $this = $( this );
 
-                if ( typeof options.fnBeforeInit === 'function' ){
-                    options.fnBeforeInit($this);
-                }
+				if ( typeof options.fnBeforeInit === 'function' ){
+					options.fnBeforeInit($this);
+				}
 
-                var data = {
-                    bDisableDefaultAutocomplete : options.bDisableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE,
-                    aiDisabledKeycodes          : options.aiDisabledKeycodes || DEFAULT_DISABLED_KEYCODES,
-                    fnComparator                : options.fnComparator || DEFAULT_COMPARATOR,
-                    fnSorter                    : options.fnSorter || DEFAULT_SORTER,
-                    fnElementConstructor        : options.fnElementConstructor || DEFAULT_ELEMENT_CONSTRUCTOR,
-                    asSource                    : options.asSource || null,
-                    fnSource                    : options.fnSource || null,
-                    iThreshold                  : options.iThreshold || DEFAULT_THRESHOLD,
-                    iDelay                      : options.iDelay || DEFAULT_DELAY,
-                    iMax                        : options.iMax || DEFAULT_MAX,
-                    iFit                        : options.iFit || DEFAULT_FIT,
-                    delay_timer                 : null,
-                    asSuggestions               : null,
+				var data = {
+					bDisableDefaultAutocomplete	: options.bDisableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE,
+					aiDisabledKeycodes			: options.aiDisabledKeycodes || DEFAULT_DISABLED_KEYCODES,
+					fnComparator				: options.fnComparator || DEFAULT_COMPARATOR,
+					fnSorter					: options.fnSorter || DEFAULT_SORTER,
+					fnElementConstructor		: options.fnElementConstructor || DEFAULT_ELEMENT_CONSTRUCTOR,
+					asSource					: options.asSource || null,
+					fnSource					: options.fnSource || null,
+					iThreshold					: options.iThreshold || DEFAULT_THRESHOLD,
+					iDelay						: options.iDelay || DEFAULT_DELAY,
+					iMax						: options.iMax || DEFAULT_MAX,
+					iFit						: options.iFit || DEFAULT_FIT,
+					delay_timer					: null,
+					asSuggestions				: null,
 
-                    fnWidth                     : options.fnWidth || null,
-                    sWidth                      : options.sWidth || null,
+					fnWidth						: options.fnWidth || null,
+					sWidth						: options.sWidth || null,
 
-                    // Before / After action optional closures
-                    fnBeforeSource      : options.fnBeforeSource || null,
-                    fnAfterSource       : options.fnAfterSource || null,
-                    fnBeforeActive      : options.fnBeforeActive || null,
-                    fnAfterActive       : options.fnAfterActive || null,
-                    fnBeforeInactive    : options.fnBeforeInactive || null,
-                    fnAfterInactive     : options.fnAfterInactive || null,
-                    fnBeforeUpdate      : options.fnBeforeUpdate|| null,
-                    fnAfterUpdate       : options.fnAfterUpdate || null,
-                    fnBeforeSelect      : options.fnBeforeSelect || null,
-                    fnAfterSelect       : options.fnAfterSelect || null,
-                    fnBeforeSuggestions : options.fnBeforeSuggestions || null,
-                    fnAfterSuggestions  : options.fnAfterSuggestions || null,
-                    fnBeforeHighlight   : options.fnBeforeHighlight || null,
-                    fnAfterHighlight    : options.fnAfterHighlight || null,
-                    fnBeforeNext        : options.fnBeforeNext || null,
-                    fnAfterNext         : options.fnAfterNext || null,
-                    fnBeforePrevious    : options.fnBeforePrevious || null,
-                    fnAfterPrevious     : options.fnAfterPrevious || null,
-                    fnBeforeDestroy     : options.fnBeforeDestroy || null,
-                    fnAfterDestroy      : options.fnAfterDestroy || null
-                };
+					// Before / After action optional closures
+					fnBeforeSource		: options.fnBeforeSource || null,
+					fnAfterSource		: options.fnAfterSource || null,
+					fnBeforeActive		: options.fnBeforeActive || null,
+					fnAfterActive		: options.fnAfterActive || null,
+					fnBeforeInactive	: options.fnBeforeInactive || null,
+					fnAfterInactive		: options.fnAfterInactive || null,
+					fnBeforeUpdate		: options.fnBeforeUpdate|| null,
+					fnAfterUpdate		: options.fnAfterUpdate || null,
+					fnBeforeSelect		: options.fnBeforeSelect || null,
+					fnAfterSelect		: options.fnAfterSelect || null,
+					fnBeforeSuggestions	: options.fnBeforeSuggestions || null,
+					fnAfterSuggestions	: options.fnAfterSuggestions || null,
+					fnBeforeHighlight	: options.fnBeforeHighlight || null,
+					fnAfterHighlight	: options.fnAfterHighlight || null,
+					fnBeforeNext		: options.fnBeforeNext || null,
+					fnAfterNext			: options.fnAfterNext || null,
+					fnBeforePrevious	: options.fnBeforePrevious || null,
+					fnAfterPrevious		: options.fnAfterPrevious || null,
+					fnBeforeDestroy		: options.fnBeforeDestroy || null,
+					fnAfterDestroy		: options.fnAfterDestroy || null
+				};
 
-                if (!(data.asSource instanceof Array) && typeof data.fnSource !== "function" ){
-                    throw "asSource or fnSource must be defined!";
-                }
+				if (!(data.asSource instanceof Array) && typeof data.fnSource !== "function" ){
+					throw "asSource or fnSource must be defined!";
+				}
 
-                if( typeof data.fnSource !== 'function' && data.asSource instanceof Array ){
-                    data.fnSource = function( string, options, callback ){
-                        var results = $.grep( data.asSource, function( item ){
-                            return options.fnComparator(item, string);
-                        });
-                        results = results.sort( options.fnSorter );
-                        results = results.slice( 0, options.iMax );
-                        callback( results );
-                    };
-                }
+				if( typeof data.fnSource !== 'function' && data.asSource instanceof Array ){
+					data.fnSource = function( string, options, callback ){
+						var results = $.grep( data.asSource, function( item ){
+							return options.fnComparator(item, string);
+						});
+						results = results.sort( options.fnSorter );
+						results = results.slice( 0, options.iMax );
+						callback( results );
+					};
+				}
 
 				// Bind passed events
 				if( options.events ){
@@ -217,22 +217,22 @@ Modifed by Daniel Carbone
 				// Add elements to DOM
 				$('body').append( $container.append($suggestions) );
 
-                // Define width of the container
-                var width = 0;
-                if ( typeof data.fnWidth === "function" ){
-                    width = data.fnWidth($this, data);
-                }
-                else if ( typeof data.sWidth === "string" ){
-                    width = data.sWidth;
-                }
-                else{
-                    width = $this.outerWidth();
-                }
-                $container.width( width );
+				// Define width of the container
+				var width = 0;
+				if ( typeof data.fnWidth === "function" ){
+					width = data.fnWidth($this, data);
+				}
+				else if ( typeof data.sWidth === "string" ){
+					width = data.sWidth;
+				}
+				else{
+					width = $this.outerWidth();
+				}
+				$container.width( width );
 
-                if ( typeof options.fnAfterInit === 'function' ){
-                    options.fnAfterInit($this, data);
-                }
+				if ( typeof options.fnAfterInit === 'function' ){
+					options.fnAfterInit($this, data);
+				}
 
 			});
 
@@ -247,9 +247,9 @@ Modifed by Daniel Carbone
 				var data = $this.data('sparkart_suggest');
 				string = string || $this.val();
 
-                if ( typeof data.fnBeforeUpdate === "function" ){
-                    data.fnBeforeUpdate($this, data, string);
-                }
+				if ( typeof data.fnBeforeUpdate === "function" ){
+					data.fnBeforeUpdate($this, data, string);
+				}
 
 				var offset = $this.offset();
 				var height = $this.outerHeight();
@@ -276,33 +276,33 @@ Modifed by Daniel Carbone
 					});
 				}
 
-                if ( typeof data.fnAfterUpdate === "function" ){
-                    data.fnAfterUpdate($this, data, string);
-                }
+				if ( typeof data.fnAfterUpdate === "function" ){
+					data.fnAfterUpdate($this, data, string);
+				}
 			});
 
 		},
 
-        // Execute fnSource to get list of suggestions
-        source : function( string, options, callback ){
+		// Execute fnSource to get list of suggestions
+		source : function( string, options, callback ){
 
-            var $this = $(this);
-            var data = $this.data('sparkart_suggest');
+			var $this = $(this);
+			var data = $this.data('sparkart_suggest');
 
-            if ( typeof data.fnBeforeSource === 'function' ){
-                data.fnBeforeSource($this, data);
-            }
+			if ( typeof data.fnBeforeSource === 'function' ){
+				data.fnBeforeSource($this, data);
+			}
 
-            data.fnSource( string, options, function( suggestions ){
-                data.suggestions = suggestions;
-                callback( suggestions );
-            });
+			data.fnSource( string, options, function( suggestions ){
+				data.suggestions = suggestions;
+				callback( suggestions );
+			});
 
-            if ( typeof data.fnAfterSource === 'function' ){
-                data.fnAfterSource($this, data);
-            }
+			if ( typeof data.fnAfterSource === 'function' ){
+				data.fnAfterSource($this, data);
+			}
 
-        },
+		},
 
 		// Return the list of suggestions
 		suggestions: function( string, callback ){
@@ -311,21 +311,21 @@ Modifed by Daniel Carbone
 			var data = $this.data('sparkart_suggest');
 			string = string || $this.val();
 
-            if ( typeof data.fnBeforeSuggestions === "function" ){
-                data.fnBeforeSuggestions($this, data, string);
-            }
+			if ( typeof data.fnBeforeSuggestions === "function" ){
+				data.fnBeforeSuggestions($this, data, string);
+			}
 
-            var options = {
+			var options = {
 				fnComparator: data.fnComparator,
 				fnSorter: data.fnSorter,
 				iMax: data.iMax
 			};
 
-            $this.sparkartSuggest('source', string, options, callback);
+			$this.sparkartSuggest('source', string, options, callback);
 
-            if ( typeof data.fnAfterSuggestions === "function" ){
-                data.fnAfterSuggestions($this, data);
-            }
+			if ( typeof data.fnAfterSuggestions === "function" ){
+				data.fnAfterSuggestions($this, data);
+			}
 		},
 
 		// Highlight suggestion by index
@@ -338,16 +338,16 @@ Modifed by Daniel Carbone
 				var $selected = data.$suggestions.children('.selected');
 				var $to_highlight = data.$suggestions.children(':eq('+ index +')');
 
-                if ( typeof data.fnBeforeHighlight === "function" ){
-                    data.fnBeforeHighlight($this, data, $selected, $to_highlight);
-                }
+				if ( typeof data.fnBeforeHighlight === "function" ){
+					data.fnBeforeHighlight($this, data, $selected, $to_highlight);
+				}
 
 				$selected.removeClass('selected');
 				$to_highlight.addClass('selected');
 
-                if ( typeof data.fnAfterHighlight === "function" ){
-                    data.fnAfterHighlight($this, data, $selected, $to_highlight);
-                }
+				if ( typeof data.fnAfterHighlight === "function" ){
+					data.fnAfterHighlight($this, data, $selected, $to_highlight);
+				}
 
 			});
 
@@ -361,9 +361,9 @@ Modifed by Daniel Carbone
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
-                if ( typeof data.fnBeforeNext === "function" ){
-                    data.fnBeforeNext($this, data);
-                }
+				if ( typeof data.fnBeforeNext === "function" ){
+					data.fnBeforeNext($this, data);
+				}
 
 				if( !data.$suggestions.is(':empty') ){
 
@@ -375,9 +375,9 @@ Modifed by Daniel Carbone
 
 				}
 
-                if ( typeof data.fnAfterNext === "function" ){
-                    data.fnAfterNext($this, data);
-                }
+				if ( typeof data.fnAfterNext === "function" ){
+					data.fnAfterNext($this, data);
+				}
 
 			});
 
@@ -391,9 +391,9 @@ Modifed by Daniel Carbone
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
-                if ( typeof data.fnBeforePrevious === "function" ){
-                    data.fnBeforePrevious($this, data);
-                }
+				if ( typeof data.fnBeforePrevious === "function" ){
+					data.fnBeforePrevious($this, data);
+				}
 
 				if( !data.$suggestions.is(':empty') ){
 
@@ -405,9 +405,9 @@ Modifed by Daniel Carbone
 
 				}
 
-                if ( typeof data.fnAfterPrevious === "function" ){
-                    data.fnAfterPrevious($this, data);
-                }
+				if ( typeof data.fnAfterPrevious === "function" ){
+					data.fnAfterPrevious($this, data);
+				}
 
 			});
 
@@ -420,9 +420,9 @@ Modifed by Daniel Carbone
 
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
-                if ( typeof data.fnBeforeSelect === "function" ){
-                    data.fnBeforeSelect($this, data);
-                }
+				if ( typeof data.fnBeforeSelect === "function" ){
+					data.fnBeforeSelect($this, data);
+				}
 				index = index || data.$suggestions.children('.selected').index();
 
 				if( index > -1 ){
@@ -440,9 +440,9 @@ Modifed by Daniel Carbone
 					$this.trigger('focus', false);
 				}
 
-                if ( typeof data.fnAfterSelect === 'function' ){
-                    data.fnAfterSelect($this, data);
-                }
+				if ( typeof data.fnAfterSelect === 'function' ){
+					data.fnAfterSelect($this, data);
+				}
 			});
 		},
 
@@ -454,15 +454,15 @@ Modifed by Daniel Carbone
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
-                if ( typeof data.fnBeforeActive === 'function' ){
-                    data.fnBeforeActive($this, data);
-                }
+				if ( typeof data.fnBeforeActive === 'function' ){
+					data.fnBeforeActive($this, data);
+				}
 
 				data.$suggestions.addClass('active');
 
-                if ( typeof data.fnAfterActive === "function" ){
-                    data.fnAfterActive($this, data);
-                }
+				if ( typeof data.fnAfterActive === "function" ){
+					data.fnAfterActive($this, data);
+				}
 
 				$this.sparkartSuggest('update');
 
@@ -478,15 +478,15 @@ Modifed by Daniel Carbone
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
-                if ( typeof data.fnBeforeInactive === 'function' ){
-                    data.fnBeforeInactive($this, data);
-                }
+				if ( typeof data.fnBeforeInactive === 'function' ){
+					data.fnBeforeInactive($this, data);
+				}
 
 				data.$suggestions.removeClass('active');
 
-                if ( typeof data.fnAfterInactive === 'function' ){
-                    data.fnAfterInactive($this, data);
-                }
+				if ( typeof data.fnAfterInactive === 'function' ){
+					data.fnAfterInactive($this, data);
+				}
 
 			});
 
@@ -498,17 +498,17 @@ Modifed by Daniel Carbone
 			var $this = $(this);
 			var data = $this.data('sparkart_suggest');
 
-            if ( typeof data.fnBeforeDestroy === 'function' ){
-                data.fnBeforeDestroy($this, data);
-            }
+			if ( typeof data.fnBeforeDestroy === 'function' ){
+				data.fnBeforeDestroy($this, data);
+			}
 
 			data.$suggestions.remove();
 			$this.off('.sparkart-suggest');
 			$this.removeData('sparkart_suggest');
 
-            if ( typeof data.fnAfterDestroy === 'function' ){
-                data.fnAfterDestroy($this, data);
-            }
+			if ( typeof data.fnAfterDestroy === 'function' ){
+				data.fnAfterDestroy($this, data);
+			}
 
 		}
 
