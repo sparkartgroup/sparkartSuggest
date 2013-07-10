@@ -267,13 +267,7 @@
                 // If the input string is >= the set iThreshold, update
                 // autocomplete contents.
                 if( string && string.length >= data.iThreshold ){
-                    $this.sparkartSuggest( 'suggestions', string, function( suggestions ){
-                        for( var i in suggestions ){
-                            var suggestion_html = data.fnElementConstructor( suggestions[i] );
-                            data.$suggestions.append( suggestion_html );
-                        }
-                        data.$suggestions.toggleClass( 'empty', suggestions.length === 0 );
-                    });
+                    $this.sparkartSuggest( 'source', string);
                 }
 
                 if ( typeof data.fnAfterUpdate === "function" ){
@@ -284,18 +278,25 @@
         },
 
         // Execute fnSource to get list of suggestions
-        source : function( string, options, callback ){
+        source : function( string ){
 
             var $this = $(this);
             var data = $this.data('sparkart_suggest');
+            string = string || $this.val();
 
             if ( typeof data.fnBeforeSource === 'function' ){
                 data.fnBeforeSource( $this, data );
             }
 
+            var options = {
+                comparator: data.comparator,
+                sorter: data.sorter,
+                max: data.max
+            };
+
             data.fnSource( string, options, function( suggestions ){
                 data.suggestions = suggestions;
-                callback( suggestions );
+                $this.sparkartSuggest( "suggestions", string );
             });
 
             if ( typeof data.fnAfterSource === 'function' ){
@@ -305,23 +306,21 @@
         },
 
         // Return the list of suggestions
-        suggestions: function( string, callback ){
+        suggestions: function( string ){
 
             var $this = $(this);
             var data = $this.data('sparkart_suggest');
-            string = string || $this.val();
 
             if ( typeof data.fnBeforeSuggestions === "function" ){
                 data.fnBeforeSuggestions( $this, data, string );
             }
 
-            var options = {
-                fnComparator: data.fnComparator,
-                fnSorter: data.fnSorter,
-                iMax: data.iMax
-            };
-
-            $this.sparkartSuggest('source', string, options, callback);
+            var suggestion_html = "";
+            for( var i in data.suggestions ){
+                suggestion_html += data.fnElementConstructor( data.suggestions[i] );
+            }
+            data.$suggestions.append( suggestion_html );
+            data.$suggestions.toggleClass( 'empty', data.suggestions.length === 0 );
 
             if ( typeof data.fnAfterSuggestions === "function" ){
                 data.fnAfterSuggestions( $this, data );
