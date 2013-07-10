@@ -2,6 +2,12 @@
 
 Sparkart Suggest
 
+Originally written by Timothy Kempf
+@link https://github.com/SparkartGroupInc/sparkartSuggest
+
+Modifed by Daniel Carbone
+@link https://github.com/dcarbone/sparkartSuggest
+
 */
 
 (function( $ ){
@@ -17,16 +23,25 @@ Sparkart Suggest
 	// Built off of http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 	var DEFAULT_DISABLED_KEYCODES = [16, 17, 18, 19, 20, 33, 34, 35, 36, 37, 39, 45, 91, 92, 93,
 		112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 123, 124, 125, 144, 145];
-	var DEFAULT_COMPARATOR = function( source, string ){
+    /**
+     * @return {boolean}
+     */
+    var DEFAULT_COMPARATOR = function( source, string ){
 		// http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex#answer-6969486
 		var regex_safe_string = string.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' );
 		var regex = new RegExp( '^'+ regex_safe_string, 'i' );
 		return regex.test( source ) && string !== source;
 	};
-	var DEFAULT_SORTER = function( a, b ){
+    /**
+     * @return {number}
+     */
+    var DEFAULT_SORTER = function( a, b ){
 		return ( a < b )? -1: ( a > b )? 1: 0;
 	};
-	var DEFAULT_ELEMENT_CONSTRUCTOR = function( suggestion ){
+    /**
+     * @return {string}
+     */
+    var DEFAULT_ELEMENT_CONSTRUCTOR = function( suggestion ){
 		return '<li class="suggestion selectable">'+ suggestion +'</li>';
 	};
 
@@ -40,37 +55,63 @@ Sparkart Suggest
 			return this.each( function(){
 
 				var $this = $( this );
-				var data = {};
+                var data = {
+                    bDisableDefaultAutocomplete : options.bDisableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE,
+                    aiDisabledKeycodes          : options.aiDisabledKeycodes || DEFAULT_DISABLED_KEYCODES,
+                    fnComparator                : options.fnComparator || DEFAULT_COMPARATOR,
+                    fnSorter                    : options.fnSorter || DEFAULT_SORTER,
+                    fnElementConstructor        : options.fnElementConstructor || DEFAULT_ELEMENT_CONSTRUCTOR,
+                    asSource                    : options.asSource || null,
+                    fnSource                    : options.fnSource || null,
+                    iThreshold                  : options.iThreshold || DEFAULT_THRESHOLD,
+                    iDelay                      : options.iDelay || DEFAULT_DELAY,
+                    iMax                        : options.iMax || DEFAULT_MAX,
+                    iFit                        : options.iFit || DEFAULT_FIT,
+                    delay_timer                 : null,
+                    asSuggestions               : null,
 
-				data.disableDefaultAutocomplete = options.disableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE;
-				if (data.disableDefaultAutocomplete === true)
-				{
-					// Disable default autocomplete values
-					$this.attr("autocomplete", "off");
-				}
-				data.disabledKeycodes = options.disabledKeycodes || DEFAULT_DISABLED_KEYCODES;
-				data.comparator = options.comparator || DEFAULT_COMPARATOR;
-				data.sorter = options.sorter || DEFAULT_SORTER;
-				data.elementConstructor = options.elementConstructor || DEFAULT_ELEMENT_CONSTRUCTOR;
-				data.source = options.source || [];
-				if( typeof data.source !== 'function' ){
-					var source = data.source.slice(0);
-					data.source = function( string, options, callback ){
-						var results = $.grep( source, function( item ){
-							var result = options.comparator( item, string );
-							return result;
-						});
-						results = results.sort( options.sorter );
-						results = results.slice( 0, options.max );
-						callback( results );
-					};
-				}
-				data.threshold = options.threshold || DEFAULT_THRESHOLD;
-				data.delay = options.delay || DEFAULT_DELAY;
-				data.max = options.max || DEFAULT_MAX;
-				data.fit = options.fit || DEFAULT_FIT;
-				data.delay_timer = null;
-				data.suggestions = null;
+                    fnWidth                     : options.fnWidth || null,
+                    sWidth                      : options.sWidth || null,
+
+                    // Before / After action optional closures
+                    fnBeforeSource      : options.fnBeforeSource || null,
+                    fnAfterSource       : options.fnAfterSource || null,
+                    fnBeforeActive      : options.fnBeforeActive || null,
+                    fnAfterActive       : options.fnAfterActive || null,
+                    fnBeforeInactive    : options.fnBeforeInactive || null,
+                    fnAfterInactive     : options.fnAfterInactive || null,
+                    fnBeforeUpdate      : options.fnBeforeUpdate|| null,
+                    fnAfterUpdate       : options.fnAfterUpdate || null,
+                    fnBeforeSelect      : options.fnBeforeSelect || null,
+                    fnAfterSelect       : options.fnAfterSelect || null,
+                    fnBeforeSuggestions : options.fnBeforeSuggestions || null,
+                    fnAfterSuggestions  : options.fnAfterSuggestions || null,
+                    fnBeforeHighlight   : options.fnBeforeHighlight || null,
+                    fnAfterHighlight    : options.fnAfterHighlight || null,
+                    fnBeforeNext        : options.fnBeforeNext || null,
+                    fnAfterNext         : options.fnAfterNext || null,
+                    fnBeforePrevious    : options.fnBeforePrevious || null,
+                    fnAfterPrevious     : options.fnAfterPrevious || null,
+                    fnBeforeDestroy     : options.fnBeforeDestroy || null,
+                    fnAfterDestroy      : options.fnAfterDestroy || null,
+                    fnBeforeInit        : options.fnBeforeInit || null,
+                    fnAfterInit         : options.fnAfterInit || null
+                };
+
+                if (!(data.asSource instanceof Array) && typeof data.fnSource !== "function" ){
+                    throw "asSource or fnSource must be defined!";
+                }
+
+                if( typeof data.fnSource !== 'function' && data.asSource instanceof Array ){
+                    data.fnSource = function( string, options, callback ){
+                        var results = $.grep( data.asSource, function( item ){
+                            return options.fnComparator(item, string);
+                        });
+                        results = results.sort( options.fnSorter );
+                        results = results.slice( 0, options.iMax );
+                        callback( results );
+                    };
+                }
 
 				// Bind passed events
 				if( options.events ){
@@ -133,7 +174,7 @@ Sparkart Suggest
 							// In the event the user presses a non-character key, such as
 							// shift / ctrl / windows / etc, we do not want to re-fire
 							// the update and select events
-							case ($.inArray(e.which, data.disabledKeycodes) > -1) :
+							case ($.inArray(e.which, data.aiDisabledKeycodes) > -1) :
 								// Do nothing...
 							break;
 
@@ -142,7 +183,7 @@ Sparkart Suggest
 								if( data.delay_timer ) clearTimeout( data.delay_timer );
 								data.delay_timer = setTimeout( function(){
 									$this.sparkartSuggest('active');
-								}, data.delay );
+								}, data.iDelay );
 							break;
 						}
 					},
@@ -173,7 +214,18 @@ Sparkart Suggest
 				// Add elements to DOM
 				$('body').append( $container.append($suggestions) );
 
-				$container.width( $this.outerWidth() );
+                // Define width of the container
+                var width = 0;
+                if ( typeof data.fnWidth === "function" ){
+                    width = data.fnWidth($this);
+                }
+                else if ( typeof data.sWidth === "string" ){
+                    width = data.sWidth;
+                }
+                else{
+                    width = $this.outerWidth();
+                }
+                $container.width( width );
 			});
 		},
 
@@ -185,6 +237,11 @@ Sparkart Suggest
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 				string = string || $this.val();
+
+                if ( typeof data.fnBeforeUpdate === "function" ){
+                    data.fnBeforeUpdate($this, data, string);
+                }
+
 				var offset = $this.offset();
 				var height = $this.outerHeight();
 
@@ -198,16 +255,21 @@ Sparkart Suggest
 						left: offset.left
 					});
 
-				if( string && string.length >= data.threshold ){
+				// If the input string is >= the set iThreshold, update
+				// autocomplete contents.
+				if( string && string.length >= data.iThreshold ){
 					$this.sparkartSuggest( 'suggestions', string, function( suggestions ){
 						for( var i in suggestions ){
-							var suggestion_html = data.elementConstructor( suggestions[i] );
+							var suggestion_html = data.fnElementConstructor( suggestions[i] );
 							data.$suggestions.append( suggestion_html );
 						}
 						data.$suggestions.toggleClass( 'empty', suggestions.length === 0 );
 					});
 				}
 
+                if ( typeof data.fnAfterUpdate === "function" ){
+                    data.fnAfterUpdate($this, data, string);
+                }
 			});
 
 		},
@@ -218,17 +280,25 @@ Sparkart Suggest
 			var $this = $(this);
 			var data = $this.data('sparkart_suggest');
 			string = string || $this.val();
-			var options = {
-				comparator: data.comparator,
-				sorter: data.sorter,
-				max: data.max
+
+            if ( typeof data.fnBeforeSuggestions === "function" ){
+                data.fnBeforeSuggestions($this, data, string);
+            }
+
+            var options = {
+				fnComparator: data.fnComparator,
+				fnSorter: data.fnSorter,
+				iMax: data.iMax
 			};
 
-			data.source( string, options, function( suggestions ){
+			data.fnSource( string, options, function( suggestions ){
 				data.suggestions = suggestions;
 				callback( suggestions );
 			});
 
+            if ( typeof data.fnAfterSuggestions === "function" ){
+                data.fnAfterSuggestions($this, data);
+            }
 		},
 
 		// Highlight suggestion by index
@@ -241,8 +311,16 @@ Sparkart Suggest
 				var $selected = data.$suggestions.children('.selected');
 				var $to_highlight = data.$suggestions.children(':eq('+ index +')');
 
+                if ( typeof data.fnBeforeHighlight === "function" ){
+                    data.fnBeforeHighlight($this, data, $selected, $to_highlight);
+                }
+
 				$selected.removeClass('selected');
 				$to_highlight.addClass('selected');
+
+                if ( typeof data.fnAfterHighlight === "function" ){
+                    data.fnAfterHighlight($this, data, $selected, $to_highlight);
+                }
 
 			});
 
@@ -256,6 +334,10 @@ Sparkart Suggest
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
+                if ( typeof data.fnBeforeNext === "function" ){
+                    data.fnBeforeNext($this, data);
+                }
+
 				if( !data.$suggestions.is(':empty') ){
 
 					var $selected = data.$suggestions.children('.selected');
@@ -265,6 +347,10 @@ Sparkart Suggest
 					$next.addClass('selected');
 
 				}
+
+                if ( typeof data.fnAfterNext === "function" ){
+                    data.fnAfterNext($this, data);
+                }
 
 			});
 
@@ -278,6 +364,10 @@ Sparkart Suggest
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
+                if ( typeof data.fnBeforePrevious === "function" ){
+                    data.fnBeforePrevious($this, data);
+                }
+
 				if( !data.$suggestions.is(':empty') ){
 
 					var $selected = data.$suggestions.children('.selected');
@@ -287,6 +377,10 @@ Sparkart Suggest
 					$previous.addClass('selected');
 
 				}
+
+                if ( typeof data.fnAfterPrevious === "function" ){
+                    data.fnAfterPrevious($this, data);
+                }
 
 			});
 
@@ -299,6 +393,9 @@ Sparkart Suggest
 
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
+                if ( typeof data.fnBeforeSelect === "function" ){
+                    data.fnBeforeSelect($this, data);
+                }
 				index = index || data.$suggestions.children('.selected').index();
 
 				if( index > -1 ){
@@ -315,6 +412,10 @@ Sparkart Suggest
 
 					$this.trigger('focus', false);
 				}
+
+                if ( typeof data.fnAfterSelect === 'function' ){
+                    data.fnAfterSelect($this, data);
+                }
 			});
 		},
 
@@ -326,7 +427,15 @@ Sparkart Suggest
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
+                if ( typeof data.fnBeforeActive === 'function' ){
+                    data.fnBeforeActive($this, data);
+                }
+
 				data.$suggestions.addClass('active');
+
+                if ( typeof data.fnAfterActive === "function" ){
+                    data.fnAfterActive($this, data);
+                }
 
 				$this.sparkartSuggest('update');
 
@@ -342,7 +451,15 @@ Sparkart Suggest
 				var $this = $(this);
 				var data = $this.data('sparkart_suggest');
 
+                if ( typeof data.fnBeforeInactive === 'function' ){
+                    data.fnBeforeInactive($this, data);
+                }
+
 				data.$suggestions.removeClass('active');
+
+                if ( typeof data.fnAfterInactive === 'function' ){
+                    data.fnAfterInactive($this, data);
+                }
 
 			});
 
@@ -354,9 +471,17 @@ Sparkart Suggest
 			var $this = $(this);
 			var data = $this.data('sparkart_suggest');
 
+            if ( typeof data.fnBeforeDestroy === 'function' ){
+                data.fnBeforeDestroy($this, data);
+            }
+
 			data.$suggestions.remove();
 			$this.off('.sparkart-suggest');
 			$this.removeData('sparkart_suggest');
+
+            if ( typeof data.fnAfterDestroy === 'function' ){
+                data.fnAfterDestroy($this, data);
+            }
 
 		}
 
