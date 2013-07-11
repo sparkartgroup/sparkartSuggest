@@ -61,7 +61,7 @@
                 }
 
                 var data = {
-                    bDisableDefaultAutocomplete	: options.bDisableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE,
+                    bDisableDefaultAutocomplete : options.bDisableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE,
                     aiDisabledKeycodes          : options.aiDisabledKeycodes || DEFAULT_DISABLED_KEYCODES,
                     fnComparator                : options.fnComparator || DEFAULT_COMPARATOR,
                     fnSorter                    : options.fnSorter || DEFAULT_SORTER,
@@ -89,7 +89,7 @@
                     fnAfterUpdate       : options.fnAfterUpdate || null,
                     fnBeforeSelect      : options.fnBeforeSelect || null,
                     fnAfterSelect       : options.fnAfterSelect || null,
-                    fnBeforeSuggestions	: options.fnBeforeSuggestions || null,
+                    fnBeforeSuggestions : options.fnBeforeSuggestions || null,
                     fnAfterSuggestions  : options.fnAfterSuggestions || null,
                     fnBeforeHighlight   : options.fnBeforeHighlight || null,
                     fnAfterHighlight    : options.fnAfterHighlight || null,
@@ -134,9 +134,9 @@
 
                 // Bind interface events
                 $this.on({
-                    'focus.sparkart-suggest': function( event, fireEvent ){
+                    'focus.sparkart-suggest': function( e, fireEvent ){
                         if (fireEvent === undefined || fireEvent === true){
-                            $this.sparkartSuggest('active');
+                            $this.sparkartSuggest('active', e);
                         }
                     },
                     'keydown.sparkart-suggest': function( e ){
@@ -146,36 +146,36 @@
                         switch(true){
                             // Up
                             case e.which === 38 :
-                                e.preventDefault();
-                                $this.sparkartSuggest('previous');
+                                e.preDefault();
+                                $this.sparkartSuggest('previous', e);
                             break;
                             // Down
                             case e.which === 40 :
-                                e.preventDefault();
-                                $this.sparkartSuggest('next');
+                                e.preDefault();
+                                $this.sparkartSuggest('next', e);
                             break;
                             // Enter
                             case e.which === 13 :
                                 if( $selected.length ){
-                                    e.preventDefault();
+                                    e.preDefault();
                                     e.stopPropagation();
-                                    $this.sparkartSuggest('select', $selected.index());
+                                    $this.sparkartSuggest('select', $selected.index(), e);
                                 }
                             break;
                             // Tab
                             case e.which === 9 :
-                                $this.sparkartSuggest( 'select', $selected.index() );
+                                $this.sparkartSuggest( 'select', $selected.index(), e );
                             break;
 
                             // Escape
                             case e.which === 27 :
-                                $this.sparkartSuggest('inactive');
+                                $this.sparkartSuggest('inactive', e);
                                 $this.trigger('focus', false);
                             break;
 
-                            // In the event the user presses a non-character key, such as
+                            // In the e the user presses a non-character key, such as
                             // shift / ctrl / windows / etc, we do not want to re-fire
-                            // the update and select events
+                            // the update and select es
                             case ($.inArray(e.which, data.aiDisabledKeycodes) > -1) :
                                 // Do nothing...
                             break;
@@ -184,7 +184,7 @@
                             default :
                                 if( data.delay_timer ) clearTimeout( data.delay_timer );
                                 data.delay_timer = setTimeout( function(){
-                                    $this.sparkartSuggest('active');
+                                    $this.sparkartSuggest('active', e);
                                 }, data.iDelay );
                             break;
                         }
@@ -192,12 +192,12 @@
                     'blur.sparkart-suggest': function( event ){
                         event.preventDefault();
                         event.stopPropagation();
-                        $this.sparkartSuggest('inactive');
+                        $this.sparkartSuggest('inactive', event);
                     },
                     'focusout.sparkart-suggest' : function( event ){
                         event.preventDefault();
                         event.stopPropagation();
-                        $this.sparkartSuggest('inactive');
+                        $this.sparkartSuggest('inactive', event);
                     }
                 });
 
@@ -205,12 +205,12 @@
                     /* mouse events */
                     .on('mouseenter.sparkart-suggest', '> li.selectable', function( event ){
                         var index = $(this).index();
-                        $this.sparkartSuggest( 'highlight', index );
+                        $this.sparkartSuggest( 'highlight', index, event );
                     })
                     .on('mousedown.sparkart-suggest', '> li.selectable', function( event ){
                         var $suggestion = $suggestions.children('.selected');
                         var index = $suggestion.index();
-                        $this.sparkartSuggest( 'select', index );
+                        $this.sparkartSuggest( 'select', index, event );
                     });
 
                 // Add elements to DOM
@@ -238,16 +238,23 @@
         },
 
         // Draw the suggestions list
-        update: function( string ){
+        update: function( string, event ){
 
             return this.each( function(){
 
                 var $this = $(this);
                 var data = $this.data('sparkart_suggest');
+
+                if (typeof string !== "string" && event === undefined)
+                {
+                    event = string;
+                    string = undefined;
+                }
+
                 string = string || $this.val();
 
                 if ( typeof data.fnBeforeUpdate === "function" ){
-                    data.fnBeforeUpdate( $this, data, string );
+                    data.fnBeforeUpdate( $this, data, event, string );
                 }
 
                 var offset = $this.offset();
@@ -270,7 +277,7 @@
                 }
 
                 if ( typeof data.fnAfterUpdate === "function" ){
-                    data.fnAfterUpdate( $this, data, string );
+                    data.fnAfterUpdate( $this, data, event, string );
                 }
             });
 
@@ -327,7 +334,7 @@
         },
 
         // Highlight suggestion by index
-        highlight: function( index ){
+        highlight: function( index, event ){
 
             return this.each( function(){
 
@@ -335,16 +342,19 @@
                 var data = $this.data('sparkart_suggest');
                 var $selected = data.$suggestions.children('.selected');
                 var $to_highlight = data.$suggestions.children(':eq('+ index +')');
+                var _continue;
 
                 if ( typeof data.fnBeforeHighlight === "function" ){
-                    data.fnBeforeHighlight( $this, data, $selected, $to_highlight );
+                    _continue = data.fnBeforeHighlight( $this, data, $selected, $to_highlight );
                 }
 
-                $selected.removeClass('selected');
-                $to_highlight.addClass('selected');
+                if (_continue !== false){
+                    $selected.removeClass('selected');
+                    $to_highlight.addClass('selected');
 
-                if ( typeof data.fnAfterHighlight === "function" ){
-                    data.fnAfterHighlight( $this, data, $selected, $to_highlight );
+                    if ( typeof data.fnAfterHighlight === "function" ){
+                        data.fnAfterHighlight( $this, data, $selected, $to_highlight );
+                    }
                 }
 
             });
@@ -352,29 +362,33 @@
         },
 
         // Highlight next suggestion
-        next: function(){
+        next: function(event){
 
             return this.each( function(){
 
                 var $this = $(this);
                 var data = $this.data('sparkart_suggest');
+                var _continue;
 
                 if ( typeof data.fnBeforeNext === "function" ){
-                    data.fnBeforeNext( $this, data );
+                    _continue = data.fnBeforeNext( $this, data, event );
                 }
 
-                if( !data.$suggestions.is(':empty') ){
+                if (_continue !== false){
 
-                    var $selected = data.$suggestions.children('.selected');
-                    var $next = ( $selected.length )? $selected.next(): data.$suggestions.children(':first-child');
+                    if( !data.$suggestions.is(':empty') ){
 
-                    $selected.removeClass('selected');
-                    $next.addClass('selected');
+                        var $selected = data.$suggestions.children('.selected');
+                        var $next = ( $selected.length )? $selected.next(): data.$suggestions.children(':first-child');
 
-                }
+                        $selected.removeClass('selected');
+                        $next.addClass('selected');
 
-                if ( typeof data.fnAfterNext === "function" ){
-                    data.fnAfterNext( $this, data );
+                    }
+
+                    if ( typeof data.fnAfterNext === "function" ){
+                        data.fnAfterNext( $this, data, event );
+                    }
                 }
 
             });
@@ -382,29 +396,33 @@
         },
 
         // Highlight previous suggestion
-        previous: function(){
+        previous: function(event){
 
             return this.each( function(){
 
                 var $this = $(this);
                 var data = $this.data('sparkart_suggest');
+                var _continue;
 
                 if ( typeof data.fnBeforePrevious === "function" ){
-                    data.fnBeforePrevious( $this, data );
+                    _continue = data.fnBeforePrevious( $this, data, event );
                 }
 
-                if( !data.$suggestions.is(':empty') ){
+                if (_continue !== false){
 
-                    var $selected = data.$suggestions.children('.selected');
-                    var $previous = ( $selected.length )? $selected.prev(): data.$suggestions.children(':last-child');
+                    if( !data.$suggestions.is(':empty') ){
 
-                    $selected.removeClass('selected');
-                    $previous.addClass('selected');
+                        var $selected = data.$suggestions.children('.selected');
+                        var $previous = ( $selected.length )? $selected.prev(): data.$suggestions.children(':last-child');
 
-                }
+                        $selected.removeClass('selected');
+                        $previous.addClass('selected');
 
-                if ( typeof data.fnAfterPrevious === "function" ){
-                    data.fnAfterPrevious( $this, data );
+                    }
+
+                    if ( typeof data.fnAfterPrevious === "function" ){
+                        data.fnAfterPrevious( $this, data, event );
+                    }
                 }
 
             });
@@ -412,78 +430,93 @@
         },
 
         // Select a suggestion
-        select: function( index ){
+        select: function( index, event ){
 
             return this.each( function(){
 
                 var $this = $(this);
                 var data = $this.data('sparkart_suggest');
-                if ( typeof data.fnBeforeSelect === "function" ){
-                    data.fnBeforeSelect( $this, data );
+                var _continue;
+                if (typeof index !== "number" && event === undefined)
+                {
+                    event = index;
+                    index = undefined;
                 }
                 index = index || data.$suggestions.children('.selected').index();
-
-                if( index > -1 ){
-
-                    var suggestion = data.suggestions[index];
-                    var event = $.Event('select');
-                    event.suggestion = suggestion;
-                    $this.trigger( event );
-
-                    if( event.isDefaultPrevented() ) return;
-
-                    data.$suggestions.empty().addClass('empty');
-                    $this.val( suggestion );
-
-                    $this.trigger('focus', false);
+                if ( typeof data.fnBeforeSelect === "function" ){
+                    _continue = data.fnBeforeSelect( $this, data, event, index );
                 }
 
-                if ( typeof data.fnAfterSelect === 'function' ){
-                    data.fnAfterSelect( $this, data );
+                if (_continue !== false){
+
+                    if( index > -1 ){
+
+                        var suggestion = data.suggestions[index];
+                        var event = $.Event('select');
+                        event.suggestion = suggestion;
+                        $this.trigger( event );
+
+                        if( event.isDefaultPrevented() ) return;
+
+                        data.$suggestions.empty().addClass('empty');
+                        $this.val( suggestion );
+
+                        $this.trigger('focus', false);
+                    }
+
+                    if ( typeof data.fnAfterSelect === 'function' ){
+                        data.fnAfterSelect( $this, data, event, index );
+                    }
                 }
             });
         },
 
         // Show the suggestions
-        active: function(){
+        active: function(event){
 
             return this.each( function(){
 
                 var $this = $(this);
                 var data = $this.data('sparkart_suggest');
+                var _continue;
 
                 if ( typeof data.fnBeforeActive === 'function' ){
-                    data.fnBeforeActive( $this, data );
+                    _continue = data.fnBeforeActive( $this, data, event );
                 }
 
-                data.$suggestions.addClass('active');
+                if ( _continue !== false ){
+                    data.$suggestions.addClass('active');
 
-                if ( typeof data.fnAfterActive === "function" ){
-                    data.fnAfterActive( $this, data );
+                    if ( typeof data.fnAfterActive === "function" ){
+                        data.fnAfterActive( $this, data, event );
+                    }
+
+                    $this.sparkartSuggest('update', event);
                 }
-
-                $this.sparkartSuggest('update');
 
             });
 
         },
 
         // Hide the suggestions
-        inactive: function(){
+        inactive: function(event){
 
             return this.each( function(){
 
                 var $this = $(this);
                 var data = $this.data('sparkart_suggest');
+                var _continue;
 
                 if ( typeof data.fnBeforeInactive === 'function' ){
-                    data.fnBeforeInactive( $this, data );
+                    _continue = data.fnBeforeInactive( $this, data, event );
                 }
 
-                data.$suggestions.removeClass('active');
+                if (_continue !== false){
+                    data.$suggestions.removeClass('active');
 
-                if ( typeof data.fnAfterInactive === 'function' ){
-                    data.fnAfterInactive( $this, data );
+                    if ( typeof data.fnAfterInactive === 'function' ){
+                        data.fnAfterInactive( $this, data, event );
+                    }
                 }
 
             });
