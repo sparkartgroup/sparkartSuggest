@@ -331,6 +331,7 @@
             if ( typeof data.fnAfterSuggestions === "function" ){
                 data.fnAfterSuggestions( $this, data );
             }
+
         },
 
         // Highlight suggestion by index
@@ -456,12 +457,12 @@
                         event.suggestion = suggestion;
                         $this.trigger( event );
 
-                        if( event.isDefaultPrevented() ) return;
+                        if( !event.isDefaultPrevented() ){
+                            data.$suggestions.empty().addClass('empty');
+                            $this.val( suggestion );
 
-                        data.$suggestions.empty().addClass('empty');
-                        $this.val( suggestion );
-
-                        $this.trigger('focus', false);
+                            $this.trigger('focus', false);
+                        }
                     }
 
                     if ( typeof data.fnAfterSelect === 'function' ){
