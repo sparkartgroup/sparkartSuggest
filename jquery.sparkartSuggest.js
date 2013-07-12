@@ -20,9 +20,28 @@
     var DEFAULT_FIT = true;
     var DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE = true;
     var DEFAULT_SELECT_FIRST = false;
-    // Built off of http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+
+    // Built off of
+    // @link http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
     var DEFAULT_DISABLED_KEYCODES = [16, 17, 18, 19, 20, 33, 34, 35, 36, 37, 39, 45, 91, 92, 93,
         112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 123, 124, 125, 144, 145];
+
+    // Language parameters
+    var DEFAULT_USE_LANGUAGE = false;
+    var DEFAULT_LANGUAGE = {
+        "sSuggestionInfo" : "__COUNT__ found",
+        "sNoSuggestions" : "No suggestions found",
+        "sLoadingSuggestions" : "Loading suggestions..."
+    };
+    var DEFAULT_LANGUAGE_FN = {
+        "__COUNT__" : function(suggestions){
+            return ($(suggestions).length > 1) ? $(suggestions).length + " suggestions" : "1 suggestion";
+        }
+    };
+    var DEFAULT_INFO_ELEMENT_CONSTRUCTOR = function(string){
+        return '<div class="sparkart-suggest-info">' + string + '</div>';
+    };
+
     /**
      * @return {boolean}
      */
@@ -61,13 +80,16 @@
                 }
 
                 var data = {
+                    // One of these MUST be populated
+                    asSource                    : options.asSource || null,
+                    fnSource                    : options.fnSource || null,
+
+                    // Other parameters
                     bDisableDefaultAutocomplete : options.bDisableDefaultAutocomplete || DEFAULT_DISABLE_DEFAULT_AUTOCOMPLETE,
                     aiDisabledKeycodes          : options.aiDisabledKeycodes || DEFAULT_DISABLED_KEYCODES,
                     fnComparator                : options.fnComparator || DEFAULT_COMPARATOR,
                     fnSorter                    : options.fnSorter || DEFAULT_SORTER,
                     fnElementConstructor        : options.fnElementConstructor || DEFAULT_ELEMENT_CONSTRUCTOR,
-                    asSource                    : options.asSource || null,
-                    fnSource                    : options.fnSource || null,
                     iThreshold                  : options.iThreshold || DEFAULT_THRESHOLD,
                     iDelay                      : options.iDelay || DEFAULT_DELAY,
                     iMax                        : options.iMax || DEFAULT_MAX,
@@ -75,6 +97,14 @@
                     delay_timer                 : null,
                     asSuggestions               : null,
 
+                    // Language parameters
+                    bUseLanguage                : options.bUseLanguage || DEFAULT_USE_LANGUAGE,
+                    oLanguage                   : options.oLanguage || DEFAULT_LANGUAGE,
+                    oLanguageFn                 : options.oLanguageFn || DEFAULT_LANGUAGE_FN,
+
+                    fnInfoElementConstructor    : options.fnInfoElementConstructor || DEFAULT_INFO_ELEMENT_CONSTRUCTOR,
+
+                    // Width determination
                     fnWidth                     : options.fnWidth || null,
                     sWidth                      : options.sWidth || null,
 
@@ -237,6 +267,50 @@
 
         },
 
+        // Construct and populate the info element
+        info : function ( type, caller, parameters){
+
+            var $this = $(this);
+            var data = $this.data('sparkart_suggest');
+
+            var language = $this.sparkartSuggest( 'language', type, caller, parameters );
+
+            if (data.$container.children('div.sparkart-suggest-info').length > 0){
+                data.$container.children('div.sparkart-suggest-info').html(language);
+            }
+            else{
+                data.$container.prepend(data.fnInfoElementConstructor(language));
+            }
+        },
+
+        // Return the language string associated with the passed type
+        language: function( type, caller, parameters ){
+
+            var $this = $(this);
+            var data = $this.data('sparkart_suggest');
+
+            if (!type) throw "You must specify a type when calling 'language'";
+
+            var string = data.oLanguage[type] || undefined;
+
+            if (string === undefined) throw "No oLanguage parameter associated with '" + type + "'";
+
+            var findKeys = string.match(/__[A-Z]{1,}__/g);
+
+            if (findKeys instanceof Array && findKeys.length > 0){
+                var regexp;
+                $.each(findKeys, function(index, value){
+                    if ( typeof data.oLanguageFn[value] === "function" ){
+                        regexp = new RegExp(value, "g");
+                        string = string.replace(regexp, data.oLanguageFn[value]( parameters ));
+                    }
+                    else throw "Could not find oLanguageFn function associated with '" + value + "'";
+                });
+            }
+
+            return string;
+        },
+
         // Draw the suggestions list
         update: function( string, event ){
 
@@ -273,6 +347,10 @@
                 // If the input string is >= the set iThreshold, update
                 // autocomplete contents.
                 if( string && string.length >= data.iThreshold ){
+
+                    if (data.bUseLanguage){
+                        $this.sparkartSuggest('info', 'sLoadingSuggestions', 'update', event );
+                    }
                     $this.sparkartSuggest( 'source', string);
                 }
 
@@ -319,6 +397,15 @@
 
             if ( typeof data.fnBeforeSuggestions === "function" ){
                 data.fnBeforeSuggestions( $this, data, string );
+            }
+
+            if (data.bUseLanguage){
+                if ( data.suggestions.length > 0 ){
+                    $this.sparkartSuggest('info', 'sSuggestionInfo', 'suggestions', data.suggestions);
+                }
+                else{
+                    $this.sparkartSuggest('info', 'sNoSuggestions', 'suggestions');
+                }
             }
 
             var suggestion_html = "";
