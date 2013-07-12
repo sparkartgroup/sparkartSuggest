@@ -60,6 +60,71 @@ function( source, string ){
 }
 ```
 
+## Language
+
+SparkartSuggest now has very basic Language abilities that allow the end user to define text to be displayed during various processes.
+
+* **bUseLanguage** - *(boolean)* - Whether to use the Language features of Sparkart Suggest.  Defaults to `false`.
+
+* **oLanguage** - *(hash)* - Hash of string to use for various language outputs.  Default object:
+
+```javascript
+var DEFAULT_LANGUAGE = {
+    "sSuggestionInfo" : "__COUNT__ found",
+    "sNoSuggestions" : "No suggestions found",
+    "sLoadingSuggestions" : "Loading suggestions..."
+};
+```
+### Language Special Words
+
+SparkartSuggest's language implementation supports special words in the following syntax: "__[A-Z]{1,}__".  You may use any uppercase alpha character in between the set of double-underscores.
+
+By default:
+
+```javascript
+var DEFAULT_LANGUAGE_FN = {
+    "__COUNT__" : function(suggestions){
+        return ($(suggestions).length > 1) ? $(suggestions).length + " suggestions" : "1 suggestion";
+    }
+};
+```
+
+As you can see, by default only __COUNT__ is supported, but you may add you own via:
+
+* **oLanguageFn** - *(hash)* - Hash of functions to use in Language parsing.  Exmaple:
+
+```javascript
+"oLanguageFn" : {
+	"__SANDWICH__" : function() {
+		var d = new Date();
+		var weekday=new Array(7);
+		weekday[0]="Sunday";
+		weekday[1]="Monday";
+		weekday[2]="Tuesday";
+		weekday[3]="Wednesday";
+		weekday[4]="Thursday";
+		weekday[5]="Friday";
+		weekday[6]="Saturday";
+		return weekday[d.getDay()] + " sandwich";
+	},
+	"__COUNT__" : function(suggestions){
+        return ($(suggestions).length > 1) ? $(suggestions).length + " suggestions" : "1 suggestion";
+    }
+}
+```
+
+In conjunction with:
+
+```javascript
+"oLanguage" : {
+	"sSuggestionInfo" : "My this is a great day for a tasty __SANDWICH__!  Also, I found __COUNT__!",
+	"sNoSuggestions" : "No suggestions found",
+    "sLoadingSuggestions" : "Loading suggestions..."
+}
+```
+
+The possibilities are....pretty limited right now but that will change!
+
 ## Before & After function hooks
 
 Available hooks:
